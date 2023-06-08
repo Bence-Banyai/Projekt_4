@@ -52,7 +52,7 @@ function update() {
   // Move the powerups
   for (let i = powerups.length - 1; i >= 0; i--) {
     const powerup = powerups[i];
-    powerup.x += powerup.direction * powerupSpeed;
+    powerup.x -= powerupSpeed;
 
     // Check collision with paddles
     if (
@@ -179,11 +179,127 @@ window.addEventListener("keyup", (event) => {
   keyState[event.key] = false;
 });
 
-// Resize the canvas when the window size changes
-window.addEventListener("resize", () => {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
+// Main menu variables
+let showMenu = true;
+let selectedPaddleHeight = paddleHeight;
+let selectedBallSpeed = ballSpeedX;
+
+// Draw main menu
+function drawMainMenu() {
+  // Draw the background
+  context.fillStyle = "#000";
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  // Draw the title
+  context.font = "40px Arial";
+  context.fillStyle = "#fff";
+  context.fillText("Pong Game", canvas.width / 2 - 100, canvas.height / 4);
+
+  // Draw the paddleHeight input box
+  context.font = "20px Arial";
+  context.fillText(
+    "Paddle Height:",
+    canvas.width / 2 - 80,
+    canvas.height / 2 - 40
+  );
+  context.fillText(
+    `Selected: ${selectedPaddleHeight}`,
+    canvas.width / 2 + 50,
+    canvas.height / 2 - 40
+  );
+  context.fillText("Short (60)", canvas.width / 2 - 80, canvas.height / 2 - 10);
+  context.fillText(
+    "Medium (150)",
+    canvas.width / 2 - 80,
+    canvas.height / 2 + 20
+  );
+  context.fillText("Long (220)", canvas.width / 2 - 80, canvas.height / 2 + 50);
+
+  // Draw the ballSpeed input box
+  context.fillText(
+    "Ball Speed:",
+    canvas.width / 2 - 80,
+    canvas.height / 2 + 100
+  );
+  context.fillText(
+    `Selected: ${selectedBallSpeed}`,
+    canvas.width / 2 + 50,
+    canvas.height / 2 + 100
+  );
+  context.fillText("Slow (2)", canvas.width / 2 - 80, canvas.height / 2 + 130);
+  context.fillText(
+    "Normal (4)",
+    canvas.width / 2 - 80,
+    canvas.height / 2 + 160
+  );
+  context.fillText("Fast (7)", canvas.width / 2 - 80, canvas.height / 2 + 190);
+
+  // Draw the start button
+  context.fillStyle = "#00ff00";
+  context.fillRect(canvas.width / 2 - 50, canvas.height / 2 + 250, 100, 50);
+  context.fillStyle = "#000";
+  context.fillText("Start", canvas.width / 2 - 25, canvas.height / 2 + 280);
+}
+
+// Event listener for main menu
+canvas.addEventListener("click", (event) => {
+  if (showMenu) {
+    const rect = canvas.getBoundingClientRect();
+    const mouseX = event.clientX - rect.left;
+    const mouseY = event.clientY - rect.top;
+
+    // Check if the start button is clicked
+    if (
+      mouseX >= canvas.width / 2 - 50 &&
+      mouseX <= canvas.width / 2 + 50 &&
+      mouseY >= canvas.height / 2 + 250 &&
+      mouseY <= canvas.height / 2 + 300
+    ) {
+      showMenu = false;
+      paddleHeight = selectedPaddleHeight;
+      ballSpeedX = selectedBallSpeed;
+      ballSpeedY = selectedBallSpeed;
+      update();
+    }
+
+    // Check if the paddleHeight options are clicked
+    if (mouseX >= canvas.width / 2 - 80 && mouseX <= canvas.width / 2 + 160) {
+      if (mouseY >= canvas.height / 2 - 30 && mouseY <= canvas.height / 2) {
+        selectedPaddleHeight = 60;
+      } else if (
+        mouseY >= canvas.height / 2 &&
+        mouseY <= canvas.height / 2 + 20
+      ) {
+        selectedPaddleHeight = 150;
+      } else if (
+        mouseY >= canvas.height / 2 + 30 &&
+        mouseY <= canvas.height / 2 + 60
+      ) {
+        selectedPaddleHeight = 220;
+      }
+    }
+
+    // Check if the ballSpeed options are clicked
+    if (mouseX >= canvas.width / 2 - 80 && mouseX <= canvas.width / 2 + 160) {
+      if (
+        mouseY >= canvas.height / 2 + 100 &&
+        mouseY <= canvas.height / 2 + 130
+      ) {
+        selectedBallSpeed = 2;
+      } else if (
+        mouseY >= canvas.height / 2 + 130 &&
+        mouseY <= canvas.height / 2 + 160
+      ) {
+        selectedBallSpeed = 4;
+      } else if (
+        mouseY >= canvas.height / 2 + 160 &&
+        mouseY <= canvas.height / 2 + 190
+      ) {
+        selectedBallSpeed = 7;
+      }
+    }
+  }
 });
 
-// Start the game
-update();
+// Initial draw of the main menu
+drawMainMenu();
